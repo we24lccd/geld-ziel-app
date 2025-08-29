@@ -1,0 +1,19 @@
+<div class="modal" id="addGoalModal" tabindex="-1" role="dialog" style="display:none;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">📋 Thêm Mục Tiêu</h5>
+        <button type="button" class="close" onclick="closeAddGoalModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="goalDesc" class="form-control mb-2" placeholder="Mục tiêu (VD: Mua xe)">
+        <input type="number" id="goalAmount" class="form-control mb-2" placeholder="Số tiền mục tiêu (VND)">
+        <input type="date" id="goalDeadline" class="form-control mb-2">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="addGoal()">Thêm</button>
+        <button type="button" class="btn btn-secondary" onclick="closeAddGoalModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>

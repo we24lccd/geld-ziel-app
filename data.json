@@ -6,37 +6,159 @@
             "deadline": "2025-12-31",
             "deposits": [
                 {
-                    "amount": 800000.0,
-                    "timestamp": "2025-07-14 04:20:49"
+                    "amount": 13630.0,
+                    "timestamp": "2025-07-15 00:57:00",
+                    "note": "lãi chứng khoán"
                 },
                 {
-                    "amount": 700000.0,
-                    "timestamp": "2025-07-14 04:54:26"
+                    "amount": 23617.0,
+                    "timestamp": "2025-07-17 00:55:15",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 43316.0,
+                    "timestamp": "2025-07-31 01:17:06",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 12975.0,
+                    "timestamp": "2025-08-05 09:50:29",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 83210.0,
+                    "timestamp": "2025-08-05 09:50:34",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 18415.0,
+                    "timestamp": "2025-08-05 15:03:13",
+                    "note": "lãi tích góp ( Viettel Money )"
+                },
+                {
+                    "amount": 28500.0,
+                    "timestamp": "2025-08-13 08:46:56",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 645832.0,
+                    "timestamp": "2025-08-14 08:00:54",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 1058872.0,
+                    "timestamp": "2025-08-15 09:19:47",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 312585.0,
+                    "timestamp": "2025-08-15 09:19:55",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 883384.0,
+                    "timestamp": "2025-08-15 09:20:02",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 680786.0,
+                    "timestamp": "2025-08-18 11:34:03",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 92065.0,
+                    "timestamp": "2025-08-20 09:05:24",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 422442.0,
+                    "timestamp": "2025-08-21 08:10:24",
+                    "note": "lãi chứng khoán"
                 }
-            ]
+            ],
+            "image": "goal_0_Hoi_An.jpg"
         },
         {
-            "description": "Mua Z Fold 7",
-            "amount": 51000000,
+            "description": "Mua ghế game E-Dra Wisdom EGC231 Black White",
+            "amount": 3699000,
+            "deadline": "2025-09-30",
+            "deposits": [
+                {
+                    "amount": 2197979.0,
+                    "timestamp": "2025-08-26 09:41:37",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 166141.0,
+                    "timestamp": "2025-08-26 09:41:42",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 289172.0,
+                    "timestamp": "2025-08-26 09:41:48",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 577507.0,
+                    "timestamp": "2025-08-26 09:41:55",
+                    "note": "lãi chứng khoán"
+                },
+                {
+                    "amount": 1553228.0,
+                    "timestamp": "2025-08-26 09:43:25",
+                    "note": "lãi chứng khoán"
+                }
+            ],
+            "image": "goal_1_ghe_gaming.jpg"
+        },
+        {
+            "description": "Có trăm củ tiền nhàn rỗi",
+            "amount": 100000000,
+            "deadline": "2026-02-17",
+            "deposits": [
+                {
+                    "amount": 5000000.0,
+                    "timestamp": "2025-08-13 08:47:43",
+                    "note": "tích lũy Viettel Money"
+                },
+                {
+                    "amount": 5000000.0,
+                    "timestamp": "2025-08-26 11:48:37",
+                    "note": "gửi tiết kiệm Viettel Money"
+                }
+            ],
+            "image": "goal_3_Capture.PNG"
+        },
+        {
+            "description": "10 củ dự phòng thất nghiệp",
+            "amount": 10000000,
             "deadline": "2025-12-31",
             "deposits": [
                 {
-                    "amount": 5333.0,
-                    "timestamp": "2025-07-14 04:31:08"
+                    "amount": 5000000.0,
+                    "timestamp": "2025-08-26 11:48:50",
+                    "note": "tích lũy Viettel Money"
                 },
                 {
-                    "amount": 900000.0,
-                    "timestamp": "2025-07-14 04:33:21"
-                },
-                {
-                    "amount": 5100000.0,
-                    "timestamp": "2025-07-14 04:33:27"
-                },
-                {
-                    "amount": 51000000.0,
-                    "timestamp": "2025-07-14 04:33:36"
+                    "amount": 5000000.0,
+                    "timestamp": "2025-08-26 11:49:00",
+                    "note": "gửi tiết kiệm Viettel Money"
                 }
-            ]
+            ],
+            "image": "goal_4_that_nghiep.jpg"
+        },
+        {
+            "description": "Mua điện thoại Samsung Galaxy A05S 6GB 128GB",
+            "amount": 3290000,
+            "deadline": "2026-04-25",
+            "deposits": [
+                {
+                    "amount": 203022.0,
+                    "timestamp": "2025-08-27 08:37:53",
+                    "note": "Lãi HHV"
+                }
+            ],
+            "image": "goal_4_Samsung_Galaxy_A05s_6GB_-_128GB.jpg"
         }
     ]
 }

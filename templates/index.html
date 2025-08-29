@@ -2,303 +2,62 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Money Goal Tracker</title>
+    <title>Geld-Ziel-App 💰</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: row;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background: #f8f9fa;
-            border-right: 1px solid #dee2e6;
-            padding: 15px;
-            position: relative;
-        }
-
-        .sidebar h3 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .goal-item {
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .goal-item.active, .goal-item:hover {
-            background-color: #e9ecef;
-            font-weight: bold;
-        }
-
-        .reset-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 50px;
-            padding: 10px 20px;
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 1000;
-        }
-
-        .reset-btn:hover {
-            background-color: #c82333;
-        }
-
-        .add-goal-btn {
-            margin-bottom: 10px;
-            width: 100%;
-        }
-
-        /* Content */
-        .content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f1f3f5;
-        }
-
-        .goal-details {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .progress {
-            height: 20px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            background-color: #28a745;
-            height: 100%;
-            text-align: center;
-            color: #fff;
-        }
-
-        .goal-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 0;
-            gap: 10px;
-        }
-
-        .goal-entry span {
-            flex: 1;
-            word-break: break-word;
-        }
-
-        .delete-btn {
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h3>📋 Mục Tiêu</h3>
-        <button class="btn btn-success add-goal-btn" onclick="openAddGoalModal()">📋 Thêm Mục Tiêu</button>
-        {% for goal in goals %}
-            <div class="goal-item" onclick="showGoalDetails({{ loop.index0 }})" id="goalItem{{ loop.index0 }}">
+
+<div class="sidebar">
+    <h3>📋 Mục Tiêu</h3>
+    {% for goal in goals %}
+    <div class="goal-item position-relative border p-2 mb-2 rounded"
+        id="goalItem{{ loop.index0 }}"
+        onclick="showGoalDetails({{ loop.index0 }})">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <span class="goal-title flex-grow-1"
+                ondblclick="event.stopPropagation(); editGoalDesc({{ loop.index0 }})">
                 {{ goal.description }}
-            </div>
-        {% endfor %}
-    </div>
-
-    <!-- Main Content -->
-    <div class="content" id="detailPanel">
-        <p>Chọn một mục tiêu để xem chi tiết.</p>
-    </div>
-
-    <!-- Reset Button -->
-    <button class="reset-btn" onclick="resetApp()">🔄 Reset App</button>
-
-    <!-- Modal Thêm Mục Tiêu -->
-    <div class="modal" id="addGoalModal" tabindex="-1" role="dialog" style="display:none;">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">📋 Thêm Mục Tiêu</h5>
-            <button type="button" class="close" onclick="closeAddGoalModal()">&times;</button>
-          </div>
-          <div class="modal-body">
-            <input type="text" id="goalDesc" class="form-control mb-2" placeholder="Mục tiêu (VD: Mua xe)">
-            <input type="number" id="goalAmount" class="form-control mb-2" placeholder="Số tiền mục tiêu (VND)">
-            <input type="date" id="goalDeadline" class="form-control mb-2" placeholder="Hạn chót">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" onclick="addGoal()">Thêm</button>
-            <button type="button" class="btn btn-secondary" onclick="closeAddGoalModal()">Đóng</button>
-          </div>
+                {% if goal.completed %}
+                    <span class="text-success ml-1" title="Đã hoàn thành">
+                        &#10004;
+                    </span>
+                {% endif %}
+            </span>
+            <input type="text"
+                class="form-control form-control-sm d-none flex-grow-1 mr-2"
+                id="editDesc{{ loop.index0 }}"
+                onblur="saveGoalDesc({{ loop.index0 }})"
+                onkeydown="if(event.key==='Enter') saveGoalDesc({{ loop.index0 }})">
+            <button class="delete-goal-btn btn btn-sm btn-danger ml-2"
+                    onclick="event.stopPropagation(); deleteGoal({{ loop.index0 }})">✖</button>
         </div>
-      </div>
     </div>
+    {% endfor %}
 
-    <script>
-        const goals = {{ goals|tojson }};
+    {% if not goals %}
+        <p class="text-muted">Không có mục tiêu nào. Hãy thêm mục tiêu mới!</p>
+    {% endif %}
 
-        function showGoalDetails(index) {
-            document.querySelectorAll('.goal-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('goalItem' + index).classList.add('active');
+    <!-- Nút thêm mục tiêu mới luôn hiển thị ở cuối sidebar -->
+    <button class="btn btn-success btn-block mt-3" onclick="openAddGoalModal()">➕ Thêm Mục Tiêu</button>
 
-            let goal = goals[index];
-            let html = `
-                <div class="goal-details">
-                    <h2>📌 ${goal.description}</h2>
-                    <p><strong>Số tiền mục tiêu:</strong> ${goal.amount_fmt}</p>
-                    <p><strong>Hạn chót:</strong> ${goal.deadline}</p>
-                    <p><strong>Đã tích lũy:</strong> ${goal.total_saved_fmt}</p>
-                    <p><strong>Số tiền cần mỗi ngày:</strong> ${goal.daily_needed_fmt}</p>
+    {% for goal in goals %}
+        <input type="hidden" id="goalImage{{ loop.index0 }}" value="{{ goal.image }}">
+    {% endfor %}
+</div>
 
-                <div class="progress">
-                    <div class="progress-bar" style="width: ${goal.progress_percent}%">
-                        ${goal.progress_percent.toFixed(1)}%
-                    </div>
-                </div>
+<div class="content" id="detailPanel">
+    <p>Chọn một mục tiêu để xem chi tiết.</p>
+</div>
 
-                ${goal.completed ? `<p style="color: green; font-weight: bold; margin-top: 10px;">${goal.completion_message}</p>` : ""}
+<button class="reset-btn" onclick="resetApp()">🔄 Reset App</button>
 
-                    <h3>📜 Quá Trình Tích Lũy</h3>
-                    <ul>
-                    ${goal.deposits.map((d, i) => `
-                        <li>
-                        <div class="goal-entry">
-                            <span>${d.timestamp}: ${d.amount_fmt} VND (${d.percent}%)</span>
-                            <button class="delete-btn" onclick="deleteDeposit(${index}, ${i})">✖</button>
-                        </div>
-                        </li>
-                    `).join('')}
-                    </ul>
-                    <input type="number" id="depositInput${index}" placeholder="Nhập số tiền (VND)">
-                    <button class="btn btn-success mt-2" onclick="addDeposit(${index})">Thêm Tích Lũy</button>
-                </div>
-            `;
-            document.getElementById('detailPanel').innerHTML = html;
-        }
+{% include 'modal.html' %}
 
-        function openAddGoalModal() {
-            document.getElementById('addGoalModal').style.display = 'block';
-        }
+<script>
+  window.goalsFromServer = {{ goals|tojson }};
+</script>
 
-        function closeAddGoalModal() {
-            document.getElementById('addGoalModal').style.display = 'none';
-        }
-
-        function addGoal() {
-            let description = document.getElementById('goalDesc').value;
-            let amount = parseFloat(document.getElementById('goalAmount').value);
-            let deadline = document.getElementById('goalDeadline').value;
-
-            if (!description || !amount || amount <= 0) {
-                alert("Vui lòng nhập đầy đủ thông tin hợp lệ.");
-                return;
-            }
-
-            fetch('/add_goal', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({description, amount, deadline})
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                location.reload();
-            });
-        }
-
-        function addDeposit(goalId) {
-    let amount = parseFloat(document.getElementById('depositInput' + goalId).value);
-    if (!amount || amount <= 0) {
-        alert("Vui lòng nhập số tiền hợp lệ.");
-        return;
-    }
-
-    fetch(`/deposit/${goalId}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({amount})
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.error) {
-            alert(data.error);
-        } else {
-            alert(data.message);
-            fetch(`/goal/${goalId}`) // 🔥 fetch lại mục tiêu vừa update
-            .then(res => res.json())
-            .then(updatedGoal => {
-                goals[goalId] = updatedGoal;
-                showGoalDetails(goalId); // giữ nguyên tab đang mở
-            });
-        }
-    });
-}
-
-        function deleteDeposit(goalId, depositId) {
-            if (!confirm("Bạn có chắc chắn muốn xoá khoản tích lũy này?")) return;
-
-            fetch(`/deposit/${goalId}/${depositId}`, {method: 'DELETE'})
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
-                alert(data.message);
-
-                // Fetch lại dữ liệu của mục tiêu này để cập nhật UI
-                fetch(`/goal/${goalId}`)
-                .then(res => res.json())
-                .then(updatedGoal => {
-                    // Cập nhật object goals
-                    goals[goalId] = updatedGoal;
-
-                    // Hiển thị lại chi tiết mục tiêu đang mở
-                    showGoalDetails(goalId);
-                });
-            });
-        }
-
-        function resetApp() {
-            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ dữ liệu?")) return;
-            fetch('/reset', {method: 'POST'})
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                location.reload();
-            });
-        }
-    </script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
-</html>

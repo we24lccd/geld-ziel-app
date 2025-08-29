@@ -1,84 +1,15 @@
 from flask import Flask, render_template, request, jsonify
-import json
+from werkzeug.utils import secure_filename
 import os
-from datetime import datetime, date
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from datetime import datetime
+
+from config import UPLOAD_FOLDER
+from utils import allowed_file, format_currency
+from models import read_data, write_data, enrich_goal
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
-DATA_FILE = 'data.json'
-
-
-def read_data():
-    if not os.path.exists(DATA_FILE):
-        return {"goals": []}
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def write_data(data):
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-
-
-def format_currency(amount):
-    return f"{amount:,.0f}".replace(",", ".")
-
-
-def number_to_words(n):
-    from num2words import num2words
-    if n <= 0:
-        return "không"
-    try:
-        return num2words(n, lang='vi')
-    except Exception:
-        return "không xác định"
-
-
-def capitalize_first(s):
-    return s[0].upper() + s[1:] if s else s
-
-
-def enrich_goal(goal):
-    goal['description'] = capitalize_first(goal['description'].strip())
-
-    total = sum(d['amount'] for d in goal['deposits'])
-    remaining = goal['amount'] - total
-    goal['total_saved'] = total
-    goal['remaining'] = remaining
-    goal['completed'] = total >= goal['amount']
-
-    if goal['completed']:
-        goal['daily_needed'] = 0
-        goal['daily_needed_fmt'] = "0 (Không cần tích lũy)"
-        goal['progress_percent'] = 100
-        goal['completion_message'] = "🎉 Chúc mừng đã hoàn thành mục tiêu!"
-    else:
-        goal['progress_percent'] = min((total / goal['amount']) * 100, 100)
-        goal['daily_needed'] = 0
-        if goal.get('deadline'):
-            days_left = (date.fromisoformat(goal['deadline']) - date.today()).days
-            if days_left > 0:
-                goal['daily_needed'] = round(remaining / days_left, 2)
-
-        if goal['daily_needed']:
-            daily_needed_int = int(round(goal['daily_needed']))
-            daily_needed_words = capitalize_first(number_to_words(daily_needed_int)) if daily_needed_int > 0 else "Không cần tích lũy"
-            goal['daily_needed_fmt'] = f"{format_currency(goal['daily_needed'])} ({daily_needed_words})"
-        else:
-            goal['daily_needed_fmt'] = "0 (Không cần tích lũy)"
-
-    goal['amount_fmt'] = f"{format_currency(goal['amount'])} ({capitalize_first(number_to_words(goal['amount']))})"
-    goal['total_saved_fmt'] = f"{format_currency(total)} ({capitalize_first(number_to_words(total))})"
-
-    for d in goal['deposits']:
-        d['amount_fmt'] = f"{format_currency(d['amount'])}"
-        percent = (d['amount'] / goal['amount']) * 100 if goal['amount'] else 0
-        d['percent'] = round(percent, 1)
-        d['amount_words'] = capitalize_first(number_to_words(d['amount']))
-
-    return goal
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def index():
@@ -86,17 +17,14 @@ def index():
     goals = [enrich_goal(g) for g in data['goals']]
     return render_template('index.html', goals=goals)
 
-
 @app.route('/goal/<int:goal_id>')
 def get_goal(goal_id):
-    """API lấy dữ liệu 1 mục tiêu"""
     data = read_data()
     try:
         goal = enrich_goal(data['goals'][goal_id])
         return jsonify(goal)
     except IndexError:
         return jsonify({"error": "Không tìm thấy mục tiêu."}), 404
-
 
 @app.route('/add_goal', methods=['POST'])
 def add_goal():
@@ -118,17 +46,17 @@ def add_goal():
     write_data(data)
     return jsonify({"message": "Đã thêm mục tiêu mới!"})
 
-
 @app.route('/deposit/<int:goal_id>', methods=['POST'])
 def deposit(goal_id):
-    # Lấy số tiền từ JSON hoặc form
     amount = None
+    note = ""
     if request.is_json:
         amount = request.json.get('amount')
+        note = request.json.get('note', "")
     else:
         amount = request.form.get('amount', type=float)
+        note = request.form.get('note', "")
 
-    # Kiểm tra số tiền hợp lệ
     try:
         amount = float(amount)
     except (TypeError, ValueError):
@@ -137,20 +65,20 @@ def deposit(goal_id):
     if amount is None or amount <= 0:
         return jsonify({"error": "Số tiền không hợp lệ"}), 400
 
-    # Đọc dữ liệu
     data = read_data()
     if goal_id < 0 or goal_id >= len(data['goals']):
         return jsonify({"error": "ID mục tiêu không hợp lệ"}), 404
 
-    # Thêm khoản tích lũy
+    from datetime import datetime, timedelta
+    vn_time = datetime.utcnow() + timedelta(hours=7)
     new_deposit = {
         "amount": amount,
-        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        "timestamp": vn_time.strftime('%Y-%m-%d %H:%M:%S'),
+        "note": note
     }
     data['goals'][goal_id]['deposits'].append(new_deposit)
     write_data(data)
 
-    # Enrich dữ liệu trả về
     updated_goal = enrich_goal(data['goals'][goal_id])
 
     return jsonify({
@@ -169,7 +97,6 @@ def delete_deposit(goal_id, deposit_index):
     except (IndexError, KeyError):
         return jsonify({"error": "Không tìm thấy khoản tích lũy"}), 404
 
-
 @app.route('/goal/<int:goal_id>', methods=['DELETE'])
 def delete_goal(goal_id):
     data = read_data()
@@ -180,12 +107,56 @@ def delete_goal(goal_id):
     except (IndexError, KeyError):
         return jsonify({"error": "Không tìm thấy mục tiêu."}), 404
 
-
 @app.route('/reset', methods=['POST'])
 def reset():
     write_data({"goals": []})
     return jsonify({"message": "Đã reset app về trạng thái ban đầu."})
 
+@app.route('/upload_image/<int:goal_id>', methods=['POST'])
+def upload_image(goal_id):
+    if 'image' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(f"goal_{goal_id}_{file.filename}")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        data = read_data()
+        if 0 <= goal_id < len(data['goals']):
+            data['goals'][goal_id]['image'] = filename
+            write_data(data)
+
+        return jsonify({"message": "Ảnh đã được cập nhật"})
+    return jsonify({"error": "Invalid file"}), 400
+
+@app.route('/update_goal/<int:goal_id>', methods=['POST'])
+def update_goal(goal_id):
+    data = read_data()
+    if goal_id < 0 or goal_id >= len(data['goals']):
+        return jsonify({"error": "ID mục tiêu không hợp lệ"}), 404
+
+    req = request.json
+    new_desc = req.get('description', '').strip()
+    if not new_desc:
+        return jsonify({"error": "Mô tả không được để trống."}), 400
+
+    data['goals'][goal_id]['description'] = new_desc
+    write_data(data)
+    return jsonify({"message": "Đã cập nhật tên mục tiêu."})
+
+@app.route('/deposit/<int:goal_id>/<int:deposit_index>/note', methods=['POST'])
+def update_deposit_note(goal_id, deposit_index):
+    data = read_data()
+    try:
+        note = request.json.get('note', '')
+        data['goals'][goal_id]['deposits'][deposit_index]['note'] = note
+        write_data(data)
+        return jsonify({"message": "Đã cập nhật ghi chú!"})
+    except (IndexError, KeyError):
+        return jsonify({"error": "Không tìm thấy khoản tích lũy"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
