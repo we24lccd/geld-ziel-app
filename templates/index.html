@@ -9,31 +9,69 @@
 <body>
 
 <div class="sidebar">
-    <h3>📋 Mục Tiêu</h3>
-    {% for goal in goals %}
-    <div class="goal-item position-relative border p-2 mb-2 rounded"
-        id="goalItem{{ loop.index0 }}"
-        onclick="showGoalDetails({{ loop.index0 }})">
-        <div class="d-flex justify-content-between align-items-center w-100">
-            <span class="goal-title flex-grow-1"
-                ondblclick="event.stopPropagation(); editGoalDesc({{ loop.index0 }})">
-                {{ goal.description }}
-                {% if goal.completed %}
-                    <span class="text-success ml-1" title="Đã hoàn thành">
-                        &#10004;
-                    </span>
-                {% endif %}
+    <div class="d-flex align-items-center mb-2">
+        <h3 class="mb-0 mr-2">📋 Mục Tiêu</h3>
+        <button class="btn btn-link btn-sm p-0" id="toggleGoalListBtn"
+            onclick="toggleGoalList(); event.stopPropagation();" title="Ẩn/Hiện danh sách mục tiêu">
+            <span id="toggleGoalListIcon">&#9660;</span>
+        </button>
+    </div>
+    <!-- Tổng cần tích lũy mỗi ngày với dropdown chi tiết -->
+    <div class="alert alert-info py-2 px-3 mb-3" style="position:relative;">
+        <strong style="font-size:1.1em;">
+            Tổng số tiền cần tích lũy mỗi ngày:
+            <button class="btn btn-link btn-sm p-0 ml-2" style="vertical-align:baseline;" 
+                onclick="toggleDailyDetail();event.stopPropagation();" title="Xem chi tiết">
+                <span id="dailyDetailIcon">&#9660;</span>
+            </button>
+        </strong>
+        <div>
+            <span id="totalDailyNeededValue" style="font-size:1.15em;">
+                {{ total_daily_needed_fmt if total_daily_needed_fmt is defined else '' }}
             </span>
-            <input type="text"
-                class="form-control form-control-sm d-none flex-grow-1 mr-2"
-                id="editDesc{{ loop.index0 }}"
-                onblur="saveGoalDesc({{ loop.index0 }})"
-                onkeydown="if(event.key==='Enter') saveGoalDesc({{ loop.index0 }})">
-            <button class="delete-goal-btn btn btn-sm btn-danger ml-2"
-                    onclick="event.stopPropagation(); deleteGoal({{ loop.index0 }})">✖</button>
+        </div>
+        <div id="dailyDetailList" style="display:none; margin-top:10px;">
+            <ul class="mb-0 pl-3">
+                {% for goal in goals %}
+                    <li>
+                        <span class="font-weight-bold">{{ goal.description }}</span>:
+                        {% if "Đã hoàn thành" in goal.daily_needed_fmt %}
+                            <span class="text-success font-italic">{{ goal.daily_needed_fmt }}</span>
+                        {% else %}
+                            <span class="text-primary">{{ goal.daily_needed_fmt }}</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
-    {% endfor %}
+    <!-- Danh sách mục tiêu -->
+    <div id="goalList">
+        {% for goal in goals %}
+        <div class="goal-item position-relative border p-2 mb-2 rounded"
+            id="goalItem{{ loop.index0 }}"
+            onclick="showGoalDetails({{ loop.index0 }})">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <span class="goal-title flex-grow-1"
+                    ondblclick="event.stopPropagation(); editGoalDesc({{ loop.index0 }})">
+                    {{ goal.description }}
+                    {% if goal.completed %}
+                        <span class="text-success ml-1" title="Đã hoàn thành">
+                            &#10004;
+                        </span>
+                    {% endif %}
+                </span>
+                <input type="text"
+                    class="form-control form-control-sm d-none flex-grow-1 mr-2"
+                    id="editDesc{{ loop.index0 }}"
+                    onblur="saveGoalDesc({{ loop.index0 }})"
+                    onkeydown="if(event.key==='Enter') saveGoalDesc({{ loop.index0 }})">
+                <button class="delete-goal-btn btn btn-sm btn-danger ml-2"
+                        onclick="event.stopPropagation(); deleteGoal({{ loop.index0 }})">✖</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
     {% if not goals %}
         <p class="text-muted">Không có mục tiêu nào. Hãy thêm mục tiêu mới!</p>
@@ -56,8 +94,33 @@
 {% include 'modal.html' %}
 
 <script>
-  window.goalsFromServer = {{ goals|tojson }};
+function toggleDailyDetail() {
+    var detail = document.getElementById('dailyDetailList');
+    var icon = document.getElementById('dailyDetailIcon');
+    if (detail.style.display === 'none') {
+        detail.style.display = 'block';
+        icon.innerHTML = '&#9650;'; // mũi tên lên
+    } else {
+        detail.style.display = 'none';
+        icon.innerHTML = '&#9660;'; // mũi tên xuống
+    }
+}
+
+// Ẩn/hiện toàn bộ danh sách mục tiêu
+function toggleGoalList() {
+    var list = document.getElementById('goalList');
+    var icon = document.getElementById('toggleGoalListIcon');
+    if (list.style.display === 'none' || list.style.display === '') {
+        list.style.display = 'block';
+        icon.innerHTML = '&#9660;'; // mũi tên xuống
+    } else {
+        list.style.display = 'none';
+        icon.innerHTML = '&#9654;'; // mũi tên sang phải
+    }
+}
+window.goalsFromServer = {{ goals|tojson }};
 </script>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+</html>

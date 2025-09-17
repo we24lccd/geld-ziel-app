@@ -151,14 +151,36 @@
             "description": "Mua điện thoại Samsung Galaxy A05S 6GB 128GB",
             "amount": 3290000,
             "deadline": "2026-04-25",
+            "deposits": [],
+            "image": "goal_4_Samsung_Galaxy_A05s_6GB_-_128GB.jpg"
+        },
+        {
+            "description": "Mua Giày cầu lông Li-Ning Nam P-AYTU025-1",
+            "amount": 1300909,
+            "deadline": "2026-05-02",
             "deposits": [
                 {
                     "amount": 203022.0,
-                    "timestamp": "2025-08-27 08:37:53",
+                    "timestamp": "2025-09-05 17:33:05",
                     "note": "Lãi HHV"
+                },
+                {
+                    "amount": 19000.0,
+                    "timestamp": "2025-09-05 17:33:28",
+                    "note": "Lãi tích lũy Viettel Money"
+                },
+                {
+                    "amount": 106785.0,
+                    "timestamp": "2025-09-12 13:50:21",
+                    "note": "Lãi VJC"
+                },
+                {
+                    "amount": 201568.0,
+                    "timestamp": "2025-09-17 11:09:17",
+                    "note": "Lãi VJC"
                 }
             ],
-            "image": "goal_4_Samsung_Galaxy_A05s_6GB_-_128GB.jpg"
+            "image": "goal_5_Giay_cau_long_Li-Ning_Nam_P-AYTU025-1.jpg"
         }
     ]
 }

@@ -25,7 +25,7 @@ def enrich_goal(goal):
 
     if goal['completed']:
         goal['daily_needed'] = 0
-        goal['daily_needed_fmt'] = "0 (Không cần tích lũy)"
+        goal['daily_needed_fmt'] = "0 (Đã hoàn thành)"
         goal['progress_percent'] = 100
         goal['completion_message'] = "🎉 Chúc mừng đã hoàn thành mục tiêu!"
     else:
@@ -38,10 +38,10 @@ def enrich_goal(goal):
 
         if goal['daily_needed']:
             daily_needed_int = int(round(goal['daily_needed']))
-            daily_needed_words = capitalize_first(number_to_words(daily_needed_int)) if daily_needed_int > 0 else "Không cần tích lũy"
+            daily_needed_words = capitalize_first(number_to_words(daily_needed_int)) if daily_needed_int > 0 else "Đã hoàn thành"
             goal['daily_needed_fmt'] = f"{format_currency(goal['daily_needed'])} ({daily_needed_words})"
         else:
-            goal['daily_needed_fmt'] = "0 (Không cần tích lũy)"
+            goal['daily_needed_fmt'] = "0 (Đã hoàn thành)"
 
     goal['amount_fmt'] = f"{format_currency(goal['amount'])} ({capitalize_first(number_to_words(goal['amount']))})"
     goal['total_saved_fmt'] = f"{format_currency(total)} ({capitalize_first(number_to_words(total))})"

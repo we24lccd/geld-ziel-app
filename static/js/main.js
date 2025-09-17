@@ -20,7 +20,7 @@ function showGoalDetails(index) {
                 <p><strong>Số tiền mục tiêu:</strong> ${goal.amount_fmt}</p>
                 <p><strong>Hạn chót:</strong> ${goal.deadline || "Không có"}</p>
                 <p><strong>Đã tích lũy:</strong> ${goal.total_saved_fmt}</p>
-                <p><strong>Số tiền cần mỗi ngày:</strong> ${goal.daily_needed_fmt}</p>
+                <p><strong>Số tiền cần tích lũy mỗi ngày:</strong> ${goal.daily_needed_fmt}</p>
                 <div class="progress mb-2">
                     <div class="progress-bar" style="width: ${goal.progress_percent}%">
                         ${goal.progress_percent.toFixed(1)}%
@@ -246,3 +246,17 @@ function saveDepositNote(goalId, depositId, note) {
     goals[goalId].deposits[depositId].editingNote = false;
     updateDepositNote(goalId, depositId, note);
 }
+
+function renderTotalDailyNeeded() {
+    let total = goals.reduce((sum, g) => sum + (g.daily_needed || 0), 0);
+    let totalText = `<div class="alert alert-info py-2 px-3 mb-3">
+        <strong>Tổng cần tích lũy mỗi ngày:</strong> 
+        ${total.toLocaleString('vi-VN')} VND
+    </div>`;
+    const totalDiv = document.getElementById('totalDailyNeeded');
+    if (totalDiv) totalDiv.innerHTML = totalText;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderTotalDailyNeeded();
+});

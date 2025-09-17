@@ -15,7 +15,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def index():
     data = read_data()
     goals = [enrich_goal(g) for g in data['goals']]
-    return render_template('index.html', goals=goals)
+    # Tính tổng số tiền cần tích lũy mỗi ngày
+    total_daily_needed = sum(g.get('daily_needed', 0) for g in goals)
+    # Định dạng số tiền (ví dụ: 123456 -> "123.456 VND")
+    total_daily_needed_fmt = format_currency(total_daily_needed) + " VND"
+    return render_template('index.html', goals=goals, total_daily_needed_fmt=total_daily_needed_fmt)
 
 @app.route('/goal/<int:goal_id>')
 def get_goal(goal_id):
